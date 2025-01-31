@@ -51,4 +51,18 @@ public class PersonService {
         personList.add(person);
         return ResponseEntity.status(HttpStatus.OK).body("Person successfully registered.");
     }
+
+    public ResponseEntity updatePerson (Person person){
+        for (Person per : personList) {
+            if (per.getId().equalsIgnoreCase(person.getId())) {
+                per.setName(person.getName());
+                per.setLastname(person.getLastname());
+                per.setAge(person.getAge());
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body("Person with id: " + person.getId() + " was successfully updated");
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Person with id: " + person.getId() + " not found");
+    }
 }
