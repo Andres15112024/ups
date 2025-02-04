@@ -2,6 +2,7 @@ package com.example.ups.poo.controllers;
 
 import com.example.ups.poo.dto.Person;
 import com.example.ups.poo.service.PersonService;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +33,13 @@ public class PersonController {
     }
 
     @PutMapping("/update-person")
-public ResponseEntity updatePerson(@RequestBody Person person){
-    return personService.updatePerson(person);
+    public ResponseEntity updatePerson(@RequestBody Person person){
+        return personService.updatePerson(person);
+    }
+
+    @DeleteMapping("/delete-person")
+    public ResponseEntity deletePerson(@RequestParam String id) {
+        return personService.deletePersonById(id);
     }
 }
 
