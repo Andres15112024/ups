@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PersonService {
@@ -19,15 +20,20 @@ public class PersonService {
         this.personRepository = personRepository;
     }
 
-    public List<PersonDTO> fetchAllPeopleRecords() {
+    private PersonDTO mapPersonToPersonDTO(Person person) {
+        PersonDTO personDTO = new PersonDTO();
+        personDTO.setName(person.getName() + " " + person.getLastname());
+        personDTO.setAge(person.getAge());
+        personDTO.setId(person.getPersonId());
+        return personDTO;
+    }
+
+    private List<PersonDTO> fetchAllPeopleRecords() {
         Iterable<Person> personIterable = personRepository.findAll();
         List<PersonDTO> personDTOList = new ArrayList<>();
 
         for (Person per : personIterable) {
-            PersonDTO personDTO = new PersonDTO();
-            personDTO.setName(per.getName() + " " + per.getLastname());
-            personDTO.setAge(per.getAge());
-            personDTO.setId(per.getPersonId());
+            PersonDTO personDTO =  mapPersonToPersonDTO(per);
             personDTOList.add(personDTO);
         }
         return personDTOList;
@@ -44,14 +50,23 @@ public class PersonService {
 
     //method that finds and returns person by id
     public ResponseEntity getPersonById(String id){
-        List<PersonDTO> personDTOList = fetchAllPeopleRecords();
-        for(PersonDTO personDTO : personDTOList){
-            if(id.equalsIgnoreCase(personDTO.getId())) {
-                return ResponseEntity.status(HttpStatus.OK).body(personDTO);
-            }
-         }
-         String message = "Person with id: " + id +" not found";
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+        Optional<Person> personOptional = personRepository.findByPersonId(id);
+        if(personOptional.isPresent()) {
+            PersonDTO personDTO = mapPersonToPersonDTO(personOptional.get());
+            return ResponseEntity.status(HttpStatus.OK).body(personDTO);
+        }else {
+            String message = "Person with id: " + " not found";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+        }
+    }
+//        List<PersonDTO> personDTOList = fetchAllPeopleRecords();
+//        for(PersonDTO personDTO : personDTOList){
+//            if(id.equalsIgnoreCase(personDTO.getId())) {
+//                return ResponseEntity.status(HttpStatus.OK).body(personDTO);
+//            }
+//         }
+//         String message = "Person with id: " + id +" not found";
+//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
     }
 
 //    public ResponseEntity getPersonById(String id) {
@@ -121,4 +136,5 @@ public class PersonService {
 //        return ResponseEntity.status(HttpStatus.NOT_FOUND)
 //                .body("Person with id: " + id + " was not found");
 //    }
-}
+
+
